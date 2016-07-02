@@ -15,13 +15,21 @@
     "clean": "nwb clean",
     "start": "nwb serve",
     "test": "nwb test",
+    "lint": "eslint -c .eslintrc src/** --ext .js --ext .jsx",
     "test:watch": "nwb test --server"
   },
-  "dependencies": {},
+  "dependencies": {
+    "classnames": "^2.2.5"
+  },
   "peerDependencies": {
     "react": "15.x"
   },
   "devDependencies": {
+    "eslint": "^3.0.0",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-import": "^1.10.0",
+    "eslint-plugin-jsx-a11y": "^1.5.3",
+    "eslint-plugin-react": "^5.2.2",
     "nwb": "0.11.x",
     "react": "^15.2.0",
     "react-dom": "^15.2.0"
