@@ -4,7 +4,12 @@ import { render } from 'react-dom';
 import { Floater } from '../../src';
 
 const Demo = () => (
-  <div style={{ minHeight: '2000px' }}>
+  <div
+    style={{
+      minHeight: '2000px',
+      backgroundImage: 'url("https://images.blogthings.com/thejapanesepatterntest/japanese-pattern-1.png")',
+    }}
+  >
     <Floater>
       <div
         style={{

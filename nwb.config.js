@@ -4,7 +4,7 @@ module.exports = {
     externals: {
       'react': 'React'
     },
-    global: 'ReactFloatingObject',
+    global: 'ReactFloaters',
     jsNext: true,
     umd: true
   }
