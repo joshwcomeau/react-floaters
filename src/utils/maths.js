@@ -3,5 +3,5 @@ export function calculateNewPosition({ friction }, elem) {
   // negative numbers. we want to add a translateY of some fraction of that
   // amount.
   const { top } = elem.getBoundingClientRect();
-  elem.style.transform = `translateY(${top * friction}px)`;
+  elem.style.transform = `translateY(${top * -friction}px)`;
 }

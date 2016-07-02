@@ -1,42 +1,33 @@
 import React, { Component, PropTypes } from 'react';
 import * as validators from './utils/validators';
-import { bindToWindow, registerListener } from './utils/raf-throttle';
-import { calculateNewPosition } from './utils/maths';
+import { initializeAnimationLoop, addFloaterToAnimationLoop } from './utils/animation';
+// import { calculateNewPosition } from './utils/maths';
 
 class Floater extends Component {
   getChildContext() {}
 
   componentDidMount() {
-    // Initiate our singleton scroll event listener. This allows us to register
-    // listeners that all fire on every (throttled) scroll event.
-    // This method has a safety check built-in to ensure it can't be bound
-    // multiple times by multiple component instances.
-    bindToWindow({ eventNames: ['scroll'] });
+    // Instead of explicitly listening for scroll events, we're just going to
+    // run the animation every frame, at all times. If this turns out to be
+    // really inefficient, we can always just memoize it based on previous
+    // items' velocity & scroll position?
+    addFloaterToAnimationLoop(this.props, this.elem);
 
-    // Register our scroll listener.
-    // The way this works is the function has access to the ref and the prop
-    // components (friction, delay, etc), so it can work out all the necessary
-    // calculations on its own
-    registerListener(() => {
-      calculateNewPosition(this.props, this.elem);
-    }, 'scroll');
+    console.log("Adding", this.elem)
+
+    initializeAnimationLoop();
   }
 
   render() {
     // eslint-disable-next-line no-unused-vars
-    const {
-      typeName,
-      children,
-      friction,
-      ...props
-    } = this.props;
+    const { typeName, children, stiffness, damping, ...props } = this.props;
 
     props.ref = elem => this.elem = elem;
 
     return React.createElement(
       typeName,
       props,
-      children,
+      children
     );
   }
 }
@@ -44,12 +35,14 @@ class Floater extends Component {
 Floater.propTypes = {
   typeName: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
-  friction: validators.friction,
+  stiffness: PropTypes.number,
+  damping: PropTypes.number,
 };
 
 Floater.defaultProps = {
   typeName: 'div',
-  friction: 0.5,
+  stiffness: -40,
+  damping: -20,
 };
 
 export default Floater;
