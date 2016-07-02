@@ -1,16 +1,23 @@
-import React from 'react'
-import {render} from 'react-dom'
+import React from 'react';
+import { render } from 'react-dom';
 
-import Component from '../../src'
+import { Floater } from '../../src';
 
-let Demo = React.createClass({
-  render() {
-    return (
-      <div style={{ minHeight: '2000px' }}>
+const Demo = () => (
+  <div style={{ minHeight: '2000px' }}>
+    <Floater>
+      <div
+        style={{
+          position: 'relative',
+          top: '550px',
+          left: '200px',
+          width: '100px',
+          height: '100px',
+          backgroundColor: 'red',
+        }}
+      />
+    </Floater>
+  </div>
+);
 
-      </div>
-    )
-  }
-})
-
-render(<Demo/>, document.querySelector('#demo'))
+render(<Demo/>, document.querySelector('#demo'));
