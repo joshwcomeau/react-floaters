@@ -11,7 +11,11 @@ class Floater extends Component {
     // run the animation every frame, at all times. If this turns out to be
     // really inefficient, we can always just memoize it based on previous
     // items' velocity & scroll position?
-    FloatManager.addFloaterToAnimationLoop(this.props, this.elem)
+    FloatManager.addFloaterToAnimationLoop(this.props, this.elem);
+  }
+
+  componentWillUnmount() {
+    FloatManager.removeFloaterFromAnimationLoop(this.elem);
   }
 
   render() {

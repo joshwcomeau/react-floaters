@@ -8,7 +8,7 @@ import { calculateSpringPosition } from './physics';
 class FloatManager {
   constructor() {
     this.floaters = [];
-    this.isRunning = true;
+    this.isRunning = false;
 
     this.scrollManager = ScrollManagerFactory();
     this.timer = TimerFactory();
@@ -28,7 +28,9 @@ class FloatManager {
     const frameDuration = timer.getDurationOfFrame();
     const scrollDiff = scrollManager.getScrollDiff();
 
-    this.floaters = floaters.map(floater => {
+    // Sadly, doing this in a functional way takes 5x as long, and given that
+    // this function runs 60 times a second, perf matters.
+    floaters.forEach(floater => {
       const { stiffness, damping, velocityY, offsetY, mass, elem } = floater;
 
       // Y AXIS
@@ -45,13 +47,12 @@ class FloatManager {
 
       // TODO: Do X-axis as well.
 
-      elem.style.transform = `translateY(${-newOffsetY}px)`;
+      /* eslint-disable no-param-reassign */
+      floater.velocityY = newVelocityY;
+      floater.offsetY = newOffsetY;
+      /* eslint-enable */
 
-      return {
-        ...floater,
-        velocityY: newVelocityY,
-        offsetY: newOffsetY,
-      };
+      elem.style.transform = `translateY(${-newOffsetY}px)`;
     });
 
     requestAnimationFrame(this.update);
@@ -68,46 +69,20 @@ class FloatManager {
       velocityY: 0,
       mass: 1,
     });
+
+    if (!this.isRunning) {
+      this.isRunning = true;
+      this.update();
+    }
+  }
+
+  removeFloaterFromAnimationLoop(elem) {
+    this.floaters = this.floaters.filter(floater => floater.elem !== elem);
+
+    if (this.floaters.length === 0) {
+      this.isRunning = false;
+    }
   }
 }
 
 export default new FloatManager();
-
-// export function animate(offset) {
-//   floaters.forEach(floater => {
-//     const { stiffness, damping, velocityY, offsetY, mass, elem } = floater;
-//
-//     // Y AXIS
-//     const [newVelocityY, newOffsetY] = calculateSpringPosition({
-//       // TODO: Allow for pre-existing transforms.
-//       target: 0,
-//       frameDuration,
-//       stiffness,
-//       damping,
-//       mass,
-//       velocity: velocityY,
-//       offset: offsetY + scrollDiff,
-//     });
-//
-//     // TODO: Do X-axis as well.
-//
-//     // Note: Mutating the original here. A nicer way would be to do a `map`
-//     // instead of a `forEach`, and create a new Floater on every frame.
-//     // Because this runs so often, though, performance might actually be a factor.
-//     floater.velocityY = newVelocityY;
-//     floater.offsetY = newOffsetY;
-//
-//     elem.style.transform = `translateY(${-floater.offsetY}px)`
-//   });
-//
-//   requestAnimationFrame(animate);
-// }
-//
-// window.animate = animate;
-
-
-// eslint-disable-next-line
-export function removeFloaterFromAnimationLoop(floater) {
-  // TODO: Remove from `floaters`, and if the array becomes empty, set isRunning
-  // to false.
-}
