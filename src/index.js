@@ -1,3 +1,3 @@
-import Floater from './Floater';
+import Floater from './components/Floater';
 
 export { Floater };

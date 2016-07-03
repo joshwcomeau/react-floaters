@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import { minMaxValidator } from './utils/validators';
-import FloatManager from './utils/animation';
+import { minMaxValidator } from '../utils/validators';
+import FloatManager from '../utils/float-manager';
 // import { calculateNewPosition } from './utils/maths';
 
 class Floater extends Component {
@@ -40,8 +40,8 @@ Floater.propTypes = {
 
 Floater.defaultProps = {
   typeName: 'div',
-  stiffness: -40,
-  damping: -20,
+  stiffness: 40,
+  damping: 20,
 };
 
 export default Floater;
