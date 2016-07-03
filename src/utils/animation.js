@@ -10,6 +10,9 @@ class FloatManager {
     this.floaters = [];
     this.isRunning = false;
 
+    this.defaultSmoothing = 3;
+    this.smoothing = this.defaultSmoothing;
+
     this.scrollManager = ScrollManagerFactory();
     this.timer = TimerFactory();
 
@@ -58,8 +61,35 @@ class FloatManager {
     requestAnimationFrame(this.update);
   }
 
-  addFloaterToAnimationLoop({ stiffness, damping }, elem) {
+  updateSmoothing(newSmoothing) {
+    // `smoothing` is just a fancy word for the cache size of our ScrollManager.
+    // It's a global config, it cannot be set for a specific Floater instance.
+    // Because of that, we want to warn if the user is setting different values
+    // on different Floaters, but we still want to allow it because there are
+    // some uses for dynamically-changing cache size.
+    const isANewValue = newSmoothing !== this.smoothing;
+    const isDifferentFromDefault = newSmoothing !== this.defaultSmoothing;
+    const hasAlreadyBeenSet = this.smoothing !== this.defaultSmoothing;
+
+    if (isANewValue && isDifferentFromDefault && hasAlreadyBeenSet) {
+      console.warn(
+        `It looks like you're trying to set different 'smoothing' values.
+        You probably don't want to do this: Smoothing is a global config
+        across all your Floater instances, and changing one changes them all.`
+      );
+    }
+
+    this.smoothing = newSmoothing;
+    this.scrollManager.updateCacheSize(newSmoothing);
+  }
+
+  addFloaterToAnimationLoop({ stiffness, damping, smoothing }, elem) {
     const offsetY = elem.getBoundingClientRect().top;
+
+    //
+    if (smoothing) {
+      this.updateSmoothing(smoothing);
+    }
 
     this.floaters.push({
       stiffness,

@@ -4,8 +4,6 @@ import FloatManager from './utils/animation';
 // import { calculateNewPosition } from './utils/maths';
 
 class Floater extends Component {
-  getChildContext() {}
-
   componentDidMount() {
     // Instead of explicitly listening for scroll events, we're just going to
     // run the animation every frame, at all times. If this turns out to be
@@ -44,7 +42,6 @@ Floater.defaultProps = {
   typeName: 'div',
   stiffness: -40,
   damping: -20,
-  smoothing: 3,
 };
 
 export default Floater;

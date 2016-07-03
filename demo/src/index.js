@@ -16,8 +16,9 @@ const Demo = () => (
     }}
   >
     <Floater
-      stiffness={-100}
-      damping={-22}
+      stiffness={100}
+      damping={18}
+      smoothing={25}
       style={{
         position: 'absolute',
         zIndex: 2,
@@ -36,8 +37,8 @@ const Demo = () => (
       />
     </Floater>
     <Floater
-      stiffness={-125}
-      damping={-20}
+      stiffness={125}
+      damping={20}
       style={{
         position: 'absolute',
         zIndex: 1,
