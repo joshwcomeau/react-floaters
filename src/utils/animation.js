@@ -1,35 +1,17 @@
 import requestAnimationFrame from 'raf';
-import mean from 'lodash.mean';
-import takeRight from 'lodash.takeright';
+
+import ScrollManagerFactory from './scroll-manager';
+
+// TODO: Make this a singleton. That way I don't have to deal with any of
+// the ugliness regarding being initialized from multiple component instances.
+
 
 const floaters = [];
 let isRunning = false;
 
 let timeOfLastFrame = Date.now();
 
-const getScrollPosition = () => (
-  window.pageYOffset || document.documentElement.scrollTop
-);
-
-
-let scrollPositions = [getScrollPosition()];
-
-const updateScrollPositions = positions => {
-  return [
-    ...takeRight(positions, 10),
-    getScrollPosition(),
-  ]
-};
-
-function getScrollDiff() {
-  // TODO: X axis
-
-  scrollPositions = updateScrollPositions(scrollPositions);
-  const averagePosition = mean(scrollPositions);
-
-  const diff = scrollPositions[scrollPositions.length - 1] - averagePosition;
-  return diff;
-}
+const scrollManager = ScrollManagerFactory({ cacheSize: 10 });
 
 
 export function animate(offset) {
@@ -41,7 +23,7 @@ export function animate(offset) {
   const frameDuration = now - timeOfLastFrame;
   timeOfLastFrame = now;
 
-  let scrollDiff = getScrollDiff();
+  const scrollDiff = scrollManager.getScrollDiff();
 
   floaters.forEach(floater => {
     const { stiffness, damping, velocityY, offsetY, mass, elem } = floater;
@@ -117,6 +99,7 @@ export function removeFloaterFromAnimationLoop(floater) {
 export function initializeAnimationLoop() {
   if (!isRunning) {
     isRunning = true;
+
     animate();
   }
 }
