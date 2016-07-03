@@ -1,3 +1,6 @@
+// ScrollManager
+// Keeps a cache of recent scroll positions, provides methods for working with
+// those positions.
 import take from 'lodash.take';
 import mean from 'lodash.mean';
 
@@ -19,7 +22,7 @@ import mean from 'lodash.mean';
 
 // TODO: Support X-axis (horizontal scrolling) as well.
 
-const ScrollManagerFactory = ({ cacheSize }) => {
+const ScrollManagerFactory = ({ cacheSize = 3 } = {}) => {
   // All snapshots are stored in this private `cache` array.
   // It is limited to hold the number of entries specified by `cacheSize`.
   let cache = [];
@@ -30,11 +33,17 @@ const ScrollManagerFactory = ({ cacheSize }) => {
       return [...cache];
     },
 
+    updateCacheSize(size) {
+      // eslint-disable-next-line no-param-reassign
+      cacheSize = size;
+    },
+
     getCurrentScrollPosition() {
       return window.pageYOffset || document.documentElement.scrollTop;
     },
 
     takeSnapshot() {
+      // Add a new snapshot to the head of the cache,
       cache = [
         this.getCurrentScrollPosition(),
         ...cache.slice(0, cacheSize - 1),
@@ -44,7 +53,6 @@ const ScrollManagerFactory = ({ cacheSize }) => {
     getScrollDiff() {
       // Start by taking a snapshot, so that it's up-to-date.
       this.takeSnapshot();
-
 
       const currentScrollPosition = take(cache);
       const averageScrollPosition = mean(cache);
