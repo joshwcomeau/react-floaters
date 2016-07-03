@@ -1,4 +1,4 @@
-# React floaters
+# React Floaters
 ### A spring-based scroll animation experiment with React.js
 
 This project is the result of experimenting with parallax-like effects. Rather than simply moving two things at different speeds, I wanted to see what happened if the items were given inertia and followed some basic rules of physics.
@@ -9,6 +9,17 @@ When you scroll quickly and stop, the items shouldn't just halt instantly, they 
 
 #### Note: This is an experimental project. It is untested, and may not work in all browsers. If there is significant interest, I will write a proper release :)
 
+
+-------
+
+## Features
+
+* Organic, beautiful motion using spring physics
+* Drop-dead simple to use. Simply wrap your components in a Floater and watch 'em float.
+* Efficient - relies exclusively on hardware-accelerated properties, uses requestAnimationFrame when available, etc.
+* Predictable positioning. Unlike parallax, Floaters can be used alongside stationary elements; Floaters animate during scroll transition, but they come to rest in the right place.
+* Configurable. With 3 tweakable settings, a wide range of effects can be applied to Floaters.
+* Tiny! Only 4kb ⚡
 
 -------
 
