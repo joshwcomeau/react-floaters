@@ -3,27 +3,29 @@ import { render } from 'react-dom';
 
 import { Floater } from '../../src';
 
+import './style.css';
+
 const Demo = () => (
   <div
     style={{
-      minHeight: '2000px',
-      backgroundSize: 'cover',
+      height: '100%',
+      backgroundImage: 'url("https://www.hivestreaming.com/wp-content/uploads/2013/09/space-bg.jpg")',
+
       backgroundPosition: 'center center',
       position: 'relative',
     }}
   >
     <Floater
-      stiffness={-150}
-      damping={-8}
+      stiffness={-200}
+      damping={-12}
       style={{
         position: 'absolute',
         zIndex: 2,
         margin: 'auto',
         left: 0,
         right: 0,
-        top: '1050px',
+        top: '35%',
         width: '942px',
-        height: '621px',
         willChange: 'transform',
       }}
     >
@@ -34,17 +36,16 @@ const Demo = () => (
       />
     </Floater>
     <Floater
-      stiffness={-150}
-      damping={-6}
+      stiffness={-200}
+      damping={-10}
       style={{
         position: 'absolute',
         zIndex: 1,
         margin: 'auto',
         left: 0,
         right: 0,
-        top: '1125px',
+        top: '38%',
         width: '942px',
-        height: '621px',
         willChange: 'transform',
       }}
     >

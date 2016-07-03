@@ -1,4 +1,6 @@
 import requestAnimationFrame from 'raf';
+import mean from 'lodash.mean';
+import takeRight from 'lodash.takeright';
 
 const floaters = [];
 let isRunning = false;
@@ -9,20 +11,28 @@ const getScrollPosition = () => (
   window.pageYOffset || document.documentElement.scrollTop
 );
 
-let scrollPosition = getScrollPosition();
+
+let scrollPositions = [getScrollPosition()];
+
+const updateScrollPositions = positions => {
+  return [
+    ...takeRight(positions, 10),
+    getScrollPosition(),
+  ]
+};
 
 function getScrollDiff() {
   // TODO: X axis
 
-  const newPosition = getScrollPosition();
-  const diff = scrollPosition - newPosition;
+  scrollPositions = updateScrollPositions(scrollPositions);
+  const averagePosition = mean(scrollPositions);
 
-  scrollPosition = newPosition;
+  const diff = scrollPositions[scrollPositions.length - 1] - averagePosition;
   return diff;
 }
 
 
-export function animate() {
+export function animate(offset) {
   if (!isRunning) {
     return;
   }
@@ -31,8 +41,7 @@ export function animate() {
   const frameDuration = now - timeOfLastFrame;
   timeOfLastFrame = now;
 
-  // To avoid jerkiness, we just want to fetch
-  const scrollDiff = getScrollDiff();
+  let scrollDiff = getScrollDiff();
 
   floaters.forEach(floater => {
     const { stiffness, damping, velocityY, offsetY, mass, elem } = floater;
@@ -46,7 +55,7 @@ export function animate() {
       damping,
       mass,
       velocity: velocityY,
-      offset: offsetY - scrollDiff,
+      offset: offsetY + scrollDiff,
     });
 
     // TODO: Do X-axis as well.
@@ -62,6 +71,8 @@ export function animate() {
 
   requestAnimationFrame(animate);
 }
+
+window.animate = animate;
 
 function calculateNewPosition({
   stiffness,
@@ -85,7 +96,7 @@ function calculateNewPosition({
 export function addFloaterToAnimationLoop({ stiffness, damping }, elem) {
   const offsetY = elem.getBoundingClientRect().top;
 
-  console.log("Adding floater", floaters);
+  console.log("Initial offset", offsetY)
 
   floaters.push({
     stiffness,
@@ -95,8 +106,6 @@ export function addFloaterToAnimationLoop({ stiffness, damping }, elem) {
     velocityY: 0,
     mass: 1,
   });
-
-  console.log(floaters);
 }
 
 // eslint-disable-next-line
@@ -106,7 +115,6 @@ export function removeFloaterFromAnimationLoop(floater) {
 }
 
 export function initializeAnimationLoop() {
-  console.log("INITIALIZED. Running?", isRunning)
   if (!isRunning) {
     isRunning = true;
     animate();
