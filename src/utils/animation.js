@@ -1,17 +1,20 @@
 import requestAnimationFrame from 'raf';
 
 import ScrollManagerFactory from './scroll-manager';
+import TimerFactory from './timer';
 
-// TODO: Make this a singleton. That way I don't have to deal with any of
-// the ugliness regarding being initialized from multiple component instances.
+// const FloatManager = () => {
+//   let isRunning = false;
+//
+//
+// }
 
 
 const floaters = [];
 let isRunning = false;
 
-let timeOfLastFrame = Date.now();
-
 const scrollManager = ScrollManagerFactory({ cacheSize: 10 });
+const timer = TimerFactory();
 
 
 export function animate(offset) {
@@ -19,9 +22,7 @@ export function animate(offset) {
     return;
   }
 
-  const now = Date.now();
-  const frameDuration = now - timeOfLastFrame;
-  timeOfLastFrame = now;
+  const frameDuration = timer.getDurationOfFrame();
 
   const scrollDiff = scrollManager.getScrollDiff();
 
