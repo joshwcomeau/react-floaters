@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 
-export function friction(props, propName, componentName) {
+export const minMaxValidator = (min, max) => (props, propName, componentName) => {
   const value = props[propName];
 
   if (typeof value !== 'number') {
@@ -11,7 +11,6 @@ export function friction(props, propName, componentName) {
   }
 
   // Valid range is between 0 and 1 inclusive.
-  const [min, max] = [0, 1];
   if (value < min || value > max) {
     return new Error(
       `Invalid prop ${propName} supplied to ${componentName}.

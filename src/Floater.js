@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import * as validators from './utils/validators';
+import { minMaxValidator } from './utils/validators';
 import FloatManager from './utils/animation';
 // import { calculateNewPosition } from './utils/maths';
 
@@ -20,7 +20,7 @@ class Floater extends Component {
 
   render() {
     // eslint-disable-next-line no-unused-vars
-    const { typeName, children, stiffness, damping, ...props } = this.props;
+    const { typeName, children, stiffness, damping, smoothing, ...props } = this.props;
 
     props.ref = elem => this.elem = elem;
 
@@ -35,14 +35,16 @@ class Floater extends Component {
 Floater.propTypes = {
   typeName: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
-  stiffness: PropTypes.number,
-  damping: PropTypes.number,
+  stiffness: minMaxValidator(0, 1000),
+  damping: minMaxValidator(0, 200),
+  smoothing: minMaxValidator(1, 50),
 };
 
 Floater.defaultProps = {
   typeName: 'div',
   stiffness: -40,
   damping: -20,
+  smoothing: 3,
 };
 
 export default Floater;
