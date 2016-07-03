@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import * as validators from './utils/validators';
-import { initializeAnimationLoop, addFloaterToAnimationLoop } from './utils/animation';
+import FloatManager from './utils/animation';
 // import { calculateNewPosition } from './utils/maths';
 
 class Floater extends Component {
@@ -11,11 +11,7 @@ class Floater extends Component {
     // run the animation every frame, at all times. If this turns out to be
     // really inefficient, we can always just memoize it based on previous
     // items' velocity & scroll position?
-    addFloaterToAnimationLoop(this.props, this.elem);
-
-    console.log("Adding", this.elem)
-
-    initializeAnimationLoop();
+    FloatManager.addFloaterToAnimationLoop(this.props, this.elem)
   }
 
   render() {

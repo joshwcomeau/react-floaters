@@ -2,105 +2,112 @@ import requestAnimationFrame from 'raf';
 
 import ScrollManagerFactory from './scroll-manager';
 import TimerFactory from './timer';
-
-// const FloatManager = () => {
-//   let isRunning = false;
-//
-//
-// }
+import { calculateSpringPosition } from './physics';
 
 
-const floaters = [];
-let isRunning = false;
+class FloatManager {
+  constructor() {
+    this.floaters = [];
+    this.isRunning = true;
 
-const scrollManager = ScrollManagerFactory({ cacheSize: 10 });
-const timer = TimerFactory();
+    this.scrollManager = ScrollManagerFactory();
+    this.timer = TimerFactory();
 
+    this.update = this.update.bind(this);
 
-export function animate(offset) {
-  if (!isRunning) {
-    return;
+    this.update();
   }
 
-  const frameDuration = timer.getDurationOfFrame();
+  update() {
+    // TODO: if the scroll position hasn't changed and the floaters don't have
+    // any velocity, don't bother with all the calculations?
+    const { floaters, isRunning, scrollManager, timer } = this;
 
-  const scrollDiff = scrollManager.getScrollDiff();
+    if (!isRunning) { return; }
 
-  floaters.forEach(floater => {
-    const { stiffness, damping, velocityY, offsetY, mass, elem } = floater;
+    const frameDuration = timer.getDurationOfFrame();
+    const scrollDiff = scrollManager.getScrollDiff();
 
-    // Y AXIS
-    const [newVelocityY, newOffsetY] = calculateNewPosition({
-      // TODO: Allow for pre-existing transforms.
-      target: 0,
-      frameDuration,
-      stiffness,
-      damping,
-      mass,
-      velocity: velocityY,
-      offset: offsetY + scrollDiff,
+    this.floaters = floaters.map(floater => {
+      const { stiffness, damping, velocityY, offsetY, mass, elem } = floater;
+
+      // Y AXIS
+      const [newVelocityY, newOffsetY] = calculateSpringPosition({
+        // TODO: Allow for pre-existing transforms.
+        target: 0,
+        frameDuration,
+        stiffness,
+        damping,
+        mass,
+        velocity: velocityY,
+        offset: offsetY + scrollDiff,
+      });
+
+      // TODO: Do X-axis as well.
+
+      elem.style.transform = `translateY(${-newOffsetY}px)`;
+
+      return {
+        ...floater,
+        velocityY: newVelocityY,
+        offsetY: newOffsetY,
+      };
     });
 
-    // TODO: Do X-axis as well.
+    requestAnimationFrame(this.update);
+  }
 
-    // Note: Mutating the original here. A nicer way would be to do a `map`
-    // instead of a `forEach`, and create a new Floater on every frame.
-    // Because this runs so often, though, performance might actually be a factor.
-    floater.velocityY = newVelocityY;
-    floater.offsetY = newOffsetY;
+  addFloaterToAnimationLoop({ stiffness, damping }, elem) {
+    const offsetY = elem.getBoundingClientRect().top;
 
-    elem.style.transform = `translateY(${-floater.offsetY}px)`
-  });
-
-  requestAnimationFrame(animate);
+    this.floaters.push({
+      stiffness,
+      damping,
+      elem,
+      offsetY,
+      velocityY: 0,
+      mass: 1,
+    });
+  }
 }
 
-window.animate = animate;
+export default new FloatManager();
 
-function calculateNewPosition({
-  stiffness,
-  damping,
-  offset,
-  velocity,
-  mass,
-  target,
-  frameDuration,
-}) {
-  const spring = stiffness * (offset - target);
-  const damper = damping * velocity;
-  const acceleration = (spring + damper) / mass;
+// export function animate(offset) {
+//   floaters.forEach(floater => {
+//     const { stiffness, damping, velocityY, offsetY, mass, elem } = floater;
+//
+//     // Y AXIS
+//     const [newVelocityY, newOffsetY] = calculateSpringPosition({
+//       // TODO: Allow for pre-existing transforms.
+//       target: 0,
+//       frameDuration,
+//       stiffness,
+//       damping,
+//       mass,
+//       velocity: velocityY,
+//       offset: offsetY + scrollDiff,
+//     });
+//
+//     // TODO: Do X-axis as well.
+//
+//     // Note: Mutating the original here. A nicer way would be to do a `map`
+//     // instead of a `forEach`, and create a new Floater on every frame.
+//     // Because this runs so often, though, performance might actually be a factor.
+//     floater.velocityY = newVelocityY;
+//     floater.offsetY = newOffsetY;
+//
+//     elem.style.transform = `translateY(${-floater.offsetY}px)`
+//   });
+//
+//   requestAnimationFrame(animate);
+// }
+//
+// window.animate = animate;
 
-  const newVelocity = velocity + acceleration * (frameDuration / 1000);
-  const newOffset = offset + newVelocity * (frameDuration / 1000);
-
-  return [newVelocity, newOffset];
-}
-
-export function addFloaterToAnimationLoop({ stiffness, damping }, elem) {
-  const offsetY = elem.getBoundingClientRect().top;
-
-  console.log("Initial offset", offsetY)
-
-  floaters.push({
-    stiffness,
-    damping,
-    elem,
-    offsetY,
-    velocityY: 0,
-    mass: 1,
-  });
-}
 
 // eslint-disable-next-line
 export function removeFloaterFromAnimationLoop(floater) {
   // TODO: Remove from `floaters`, and if the array becomes empty, set isRunning
   // to false.
-}
-
-export function initializeAnimationLoop() {
-  if (!isRunning) {
-    isRunning = true;
-
-    animate();
-  }
 }
